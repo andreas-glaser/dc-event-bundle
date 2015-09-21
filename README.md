@@ -1,4 +1,4 @@
-NotifyBundle
+DCEventBundle
 ============
 
-A symfony 2 bundle, helping you to send email, sms and other notifications.
+Doctrine Custom Event Bundle - Enabling you to persist, update, delete entities within prePersist/preUpdate/preRemove events
