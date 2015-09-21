@@ -1,0 +1,24 @@
+{
+  "name": "andreas-glaser/dc-event-bundle",
+  "type": "symfony-bundle",
+  "description": "Doctrine Custom Event Bundle - Enabling you to persist, update, delete entities within prePersist/preUpdate/preRemove events",
+  "homepage": "https://github.com/andreas-glaser/dc-event-bundle",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Andreas Glaser",
+      "email": "andreas.c.glaser@gmail.com"
+    }
+  ],
+  "require": {
+    "php": ">=5.4.0"
+  },
+  "autoload": {
+    "psr-4": {"AndreasGlaser\\DCEventBundle\\": ""}
+  },
+  "extra": {
+    "branch-alias": {
+      "dev-master": "0.1.x-dev"
+    }
+  }
+}
