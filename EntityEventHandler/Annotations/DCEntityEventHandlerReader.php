@@ -28,7 +28,7 @@ class DCEntityEventHandlerReader
                 'AndreasGlaser\\DCEventBundle\\EntityEventHandler\\Annotations\\DCEntityEventHandler'
             );
 
-        if (!$apiMetaAnnotation->class) {
+        if (!$apiMetaAnnotation || !$apiMetaAnnotation->class) {
             return null;
         }
 

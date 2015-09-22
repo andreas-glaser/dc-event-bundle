@@ -123,8 +123,6 @@ class DCEventListener implements EventSubscriber, ContainerAwareInterface
      */
     public function postFlush(PostFlushEventArgs $postFlushEventArgs)
     {
-        $this->unitOfWork->clear();
-
         foreach ($this->processedEntities['persist'] AS $entity) {
             if ($entityEventHandler = $this->getEntityEventHandler($entity)) {
                 $entityEventHandler->postPersist();
@@ -161,19 +159,19 @@ class DCEventListener implements EventSubscriber, ContainerAwareInterface
             $reRun = true;
         }
 
-        foreach ($this->unitOfWork->getScheduledEntityDeletions() AS $hash => $entity) {
-            if (array_key_exists($hash, $this->processedEntities['remove'])) {
-                continue;
-            }
-            $this->initRemove($entity, true);
-            $reRun = true;
-        }
-
-        foreach ($this->unitOfWork->getScheduledEntityUpdates() AS $hash => $entity) {
+        foreach ($this->unitOfWork->getScheduledEntityUpdates() + $this->unitOfWork->getScheduledCollectionUpdates() AS $hash => $entity) {
             if (array_key_exists($hash, $this->processedEntities['update'])) {
                 continue;
             }
             $this->initUpdate($entity, true);
+            $reRun = true;
+        }
+
+        foreach ($this->unitOfWork->getScheduledEntityDeletions() + $this->unitOfWork->getScheduledCollectionDeletions() AS $hash => $entity) {
+            if (array_key_exists($hash, $this->processedEntities['remove'])) {
+                continue;
+            }
+            $this->initRemove($entity, true);
             $reRun = true;
         }
 
@@ -235,7 +233,7 @@ class DCEventListener implements EventSubscriber, ContainerAwareInterface
     protected function initUpdate(&$entity, $isInitial = false)
     {
         if (!$isInitial) {
-            $this->recalculate($entity);
+            $this->computeChangeSet($entity);
         }
 
         if ($entityEventHandler = $this->getEntityEventHandler($entity)) {
