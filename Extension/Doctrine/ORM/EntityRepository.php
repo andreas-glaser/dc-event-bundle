@@ -31,48 +31,6 @@ class EntityRepository extends BaseEntityRepository
     }
 
     /**
-     * @return \Doctrine\ORM\QueryBuilder
-     *
-     * @author Andreas Glaser
-     */
-    protected function qb()
-    {
-        return $this->_em->createQueryBuilder();
-    }
-
-    /**
-     * @param      $id
-     * @param null $version
-     *
-     * @return mixed
-     * @throws \Doctrine\ORM\NoResultException
-     * @throws \Doctrine\ORM\NonUniqueResultException
-     *
-     * @author Andreas Glaser
-     */
-    public function findAsArray($id, $version = null)
-    {
-        $qb = $this->_em->createQueryBuilder();
-
-        $qb
-            ->select('entity')
-            ->from($this->_entityName, 'entity')
-            ->where($qb->expr()->eq('entity.id', ':id'))
-            ->setParameter(':id', $id);
-
-        if ($version) {
-            $qb
-                ->andWhere($qb->expr()->eq('entity.version', ':version'))
-                ->setParameter(':version', $version);
-        }
-
-        return $qb
-            ->getQuery()
-            ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
-            ->getSingleResult(AbstractQuery::HYDRATE_ARRAY);
-    }
-
-    /**
      * @param \AndreasGlaser\DCEventBundle\EventListener\DCEventListener $dcEventListener
      *
      * @return $this
