@@ -2,13 +2,13 @@
 
 namespace AndreasGlaser\DCEventBundle\EventListener;
 
-use AndreasGlaser\DCEventBundle\EntityEventHandler\Annotations\DCEntityEventHandlerReader;
-use AndreasGlaser\DCEventBundle\EntityEventHandler\DCEntityEventHandlerBase;
+use AndreasGlaser\DCEventBundle\EventHandler\Annotations\DCEntityEventHandlerReader;
+use AndreasGlaser\DCEventBundle\EventHandler\DCEntityEventHandlerBase;
 use AndreasGlaser\DCEventBundle\Helper\ChangeSetHelper;
 use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
+use Doctrine\ORM\Event\PreFlushEventArgs;
 use Doctrine\ORM\UnitOfWork;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -91,18 +91,19 @@ class DCEventListener implements EventSubscriber, ContainerAwareInterface
      */
     public function getSubscribedEvents()
     {
-        return ['onFlush', 'postFlush'];
+        return ['preFlush', 'postFlush'];
     }
 
     /**
-     * @param \Doctrine\ORM\Event\OnFlushEventArgs $eventArgs
+     * @param \Doctrine\ORM\Event\PreFlushEventArgs $eventArgs
      *
      * @author Andreas Glaser
      */
-    public function onFlush(OnFlushEventArgs $eventArgs)
+    public function preFlush(PreFlushEventArgs $eventArgs)
     {
         $this->entityManager = $eventArgs->getEntityManager();
         $this->unitOfWork = $this->entityManager->getUnitOfWork();
+        $this->unitOfWork->computeChangeSets();
         $max = 50;
         $current = 0;
 

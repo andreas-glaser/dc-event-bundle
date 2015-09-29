@@ -1,13 +1,13 @@
 <?php
 
-namespace AndreasGlaser\DCEventBundle\EntityEventHandler\Annotations;
+namespace AndreasGlaser\DCEventBundle\EventHandler\Annotations;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 
 /**
  * Class DCEntityEventHandlerReader
  *
- * @package AndreasGlaser\DCEventBundle\EntityEventHandler\Annotations
+ * @package AndreasGlaser\DCEventBundle\EventHandler\Annotations
  * @author  Andreas Glaser
  */
 class DCEntityEventHandlerReader
@@ -25,7 +25,7 @@ class DCEntityEventHandlerReader
         $apiMetaAnnotation = $reader
             ->getClassAnnotation(
                 new \ReflectionClass(new $entityClass),
-                'AndreasGlaser\\DCEventBundle\\EntityEventHandler\\Annotations\\DCEntityEventHandler'
+                'AndreasGlaser\\DCEventBundle\\EventHandler\\Annotations\\DCEntityEventHandler'
             );
 
         if (!$apiMetaAnnotation || !$apiMetaAnnotation->class) {

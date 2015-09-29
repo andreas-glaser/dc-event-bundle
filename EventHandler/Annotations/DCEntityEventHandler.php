@@ -1,12 +1,12 @@
 <?php
-namespace AndreasGlaser\DCEventBundle\EntityEventHandler\Annotations;
+namespace AndreasGlaser\DCEventBundle\EventHandler\Annotations;
 
 use Doctrine\Common\Annotations\Annotation;
 
 /**
  * Class DCEntityEventHandler
  *
- * @package AndreasGlaser\DCEventBundle\EntityEventHandler\Annotations
+ * @package AndreasGlaser\DCEventBundle\EventHandler\Annotations
  * @author  Andreas Glaser
  *
  * @Annotation

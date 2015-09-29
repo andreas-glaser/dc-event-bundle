@@ -1,7 +1,7 @@
 <?php
-namespace AndreasGlaser\DCEventBundle\EntityEventHandler;
+namespace AndreasGlaser\DCEventBundle\EventHandler;
 
-use AndreasGlaser\DCEventBundle\EntityEventHandler;
+use AndreasGlaser\DCEventBundle\EventHandler;
 use AndreasGlaser\DCEventBundle\EventListener\DCEventListener;
 use AndreasGlaser\DCEventBundle\Helper\ChangeSetHelper;
 use Doctrine\ORM\EntityManagerInterface;
@@ -92,13 +92,13 @@ abstract class DCEntityEventHandlerBase extends ContainerAware
     }
 
     /**
-     * @return mixed
+     * @return void
      * @author Andreas Glaser
      */
     abstract public function prePersist();
 
     /**
-     * @return mixed
+     * @return void
      * @author Andreas Glaser
      */
     abstract public function postPersist();
@@ -106,25 +106,25 @@ abstract class DCEntityEventHandlerBase extends ContainerAware
     /**
      * @param \AndreasGlaser\DCEventBundle\Helper\ChangeSetHelper $changeSet
      *
-     * @return mixed
+     * @return void
      * @author Andreas Glaser
      */
     abstract public function preUpdate(ChangeSetHelper $changeSet);
 
     /**
-     * @return mixed
+     * @return void
      * @author Andreas Glaser
      */
     abstract public function postUpdate();
 
     /**
-     * @return mixed
+     * @return void
      * @author Andreas Glaser
      */
     abstract public function preRemove();
 
     /**
-     * @return mixed
+     * @return void
      * @author Andreas Glaser
      */
     abstract public function postRemove();
