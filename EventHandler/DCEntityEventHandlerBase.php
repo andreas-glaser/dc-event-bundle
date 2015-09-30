@@ -92,6 +92,62 @@ abstract class DCEntityEventHandlerBase extends ContainerAware
     }
 
     /**
+     * Sets an entity flag
+     *
+     * @param $flagName
+     * @param $entity
+     *
+     * @return bool
+     * @author Andreas Glaser
+     */
+    public function flagSet($flagName, $entity)
+    {
+        return $this->dcEventListener->flagSet($flagName, $entity);
+    }
+
+    /**
+     * Checks if an entity flag has been set
+     *
+     * @param $flagName
+     * @param $entity
+     *
+     * @return bool
+     * @author Andreas Glaser
+     */
+    public function flagExists($flagName, $entity)
+    {
+        return $this->dcEventListener->flagExists($flagName, $entity);
+    }
+
+    /**
+     * Removes entity flag
+     *
+     * @param $flagName
+     * @param $entity
+     *
+     * @return bool
+     * @author Andreas Glaser
+     */
+    public function flagRemove($flagName, $entity)
+    {
+        return $this->dcEventListener->flagRemove($flagName, $entity);
+    }
+
+    /**
+     * Checks if an entity flag exists and removes it.
+     *
+     * @param $flagName
+     * @param $entity
+     *
+     * @return bool
+     * @author Andreas Glaser
+     */
+    public function flagExistsAndRemove($flagName, $entity)
+    {
+        return $this->dcEventListener->flagExistsAndRemove($flagName, $entity);
+    }
+
+    /**
      * @return void
      * @author Andreas Glaser
      */

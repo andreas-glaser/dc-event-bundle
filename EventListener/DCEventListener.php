@@ -348,119 +348,86 @@ class DCEventListener implements EventSubscriber, ContainerAwareInterface
     }
 
     /**
-     * Sets a flag.
-     *
-     * @param             $flagName
-     * @param null|object $entity
-     *
-     * @return $this
-     *
-     * @author Andreas Glaser
-     */
-    protected function flagSet($flagName, $entity)
-    {
-        if (!is_object($entity)) {
-            throw new \RuntimeException('Flag requires an entity to be set');
-        }
-
-        if (!method_exists($entity, 'getId')) {
-            throw new \RuntimeException('Required method does not exist');
-        }
-
-        $class = get_class($entity);
-        $id = $entity->getId();
-
-        if (!array_key_exists($flagName, $this->flags)) {
-            $this->flags[$flagName] = [];
-        }
-
-        $index = count($this->flags[$flagName]);
-        $this->flags[$flagName][$index]['class'] = $class;
-        $this->flags[$flagName][$index]['id'] = $id;
-
-        return $this;
-    }
-
-    /**
-     * Checks if a flag exists.
+     * Sets an entity flag
      *
      * @param $flagName
+     * @param $entity
      *
      * @return bool
-     *
      * @author Andreas Glaser
      */
-    protected function flagExists($flagName, $entity)
+    public function flagSet($flagName, $entity)
     {
         if (!is_object($entity)) {
             throw new \RuntimeException('Flag requires an entity to be set');
         }
 
-        if (!method_exists($entity, 'getId')) {
-            throw new \RuntimeException('Required method does not exist');
-        }
-
-        if (!array_key_exists($flagName, $this->flags)) {
+        if ($this->flagExists($flagName, $entity)) {
             return false;
         }
 
-        $class = get_class($entity);
-        $id = $entity->getId();
+        $hash = spl_object_hash($entity);
 
-        foreach ($this->flags[$flagName] AS $k => $entityData) {
-            if ($class === $entityData['class'] && $id === $entityData['id']) {
-                return true;
-            }
+        if (!is_array($this->flags[$hash])) {
+            $this->flags[$hash] = [];
+        }
+
+        $this->flags[$hash][$flagName] = $flagName;
+
+        return true;
+    }
+
+    /**
+     * Checks if an entity flag has been set
+     *
+     * @param $flagName
+     * @param $entity
+     *
+     * @return bool
+     * @author Andreas Glaser
+     */
+    public function flagExists($flagName, $entity)
+    {
+        if (!is_object($entity)) {
+            throw new \RuntimeException('Flag requires an entity to be set');
+        }
+
+        $hash = spl_object_hash($entity);
+
+        return array_key_exists($hash, $this->flags) && array_key_exists($flagName, $this->flags[$hash]);
+    }
+
+    /**
+     * Removes an entity flag
+     *
+     * @param $flagName
+     * @param $entity
+     *
+     * @return bool
+     * @author Andreas Glaser
+     */
+    public function flagRemove($flagName, $entity)
+    {
+        if ($this->flagExists($flagName, $entity)) {
+            $hash = spl_object_hash($entity);
+            unset($this->flags[$hash][$flagName]);
+
+            return true;
         }
 
         return false;
     }
 
     /**
+     * Checks if an entity flag exists and removes it.
+     *
      * @param $flagName
      * @param $entity
      *
      * @return bool
-     *
      * @author Andreas Glaser
      */
-    protected function flagRemove($flagName, $entity)
-    {
-        if (!is_object($entity)) {
-            throw new \RuntimeException('Flag requires an entity to be set');
-        }
-
-        if (!method_exists($entity, 'getId')) {
-            throw new \RuntimeException('Required method does not exist');
-        }
-
-        if (!array_key_exists($flagName, $this->flags)) {
-            return false;
-        }
-
-        $class = get_class($entity);
-        $id = $entity->getId();
-
-        foreach ($this->flags[$flagName] AS $k => $entityData) {
-            if ($class === $entityData['class'] && $id === $entityData['id']) {
-                unset($this->flags[$flagName][$k]);
-
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * @param $flagName
-     * @param $entity
-     *
-     * @return bool
-     *
-     * @author Andreas Glaser
-     */
-    protected function flagExistsAndRemove($flagName, $entity)
+    public function flagExistsAndRemove($flagName, $entity)
     {
         $exists = $this->flagExists($flagName, $entity);
         $this->flagRemove($flagName, $entity);
