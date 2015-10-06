@@ -4,6 +4,7 @@ namespace AndreasGlaser\DCEventBundle\EventHandler;
 
 use AndreasGlaser\DCEventBundle\EventHandler;
 use AndreasGlaser\DCEventBundle\EventListener\DCEventListener;
+use AndreasGlaser\DCEventBundle\EventListener\DCEventListenerAwareTrait;
 use AndreasGlaser\DCEventBundle\Helper\ChangeSetHelper;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerAware;
@@ -16,10 +17,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 abstract class DCEntityEventHandlerBase extends ContainerAware
 {
-    /**
-     * @var \AndreasGlaser\DCEventBundle\EventListener\DCEventListener
-     */
-    protected $dcEventListener;
+    use DCEventListenerAwareTrait;
 
     /**
      * @var EntityManagerInterface
@@ -32,14 +30,14 @@ abstract class DCEntityEventHandlerBase extends ContainerAware
     protected $entity;
 
     /**
-     * @param \AndreasGlaser\DCEventBundle\EventListener\DCEventListener $customEventListener
+     * @param \AndreasGlaser\DCEventBundle\EventListener\DCEventListener $dcEventListener
      * @param \Doctrine\ORM\EntityManagerInterface                       $entityManager
      * @param                                                            $entity
      * @param \Symfony\Component\DependencyInjection\ContainerInterface  $container
      */
-    public function __construct(DCEventListener $customEventListener, EntityManagerInterface $entityManager, $entity, ContainerInterface $container)
+    public function __construct(DCEventListener $dcEventListener, EntityManagerInterface $entityManager, $entity, ContainerInterface $container)
     {
-        $this->dcEventListener = $customEventListener;
+        $this->setDCEventListener($dcEventListener);
         $this->em = $entityManager;
         $this->entity = $entity;
         $this->setContainer($container);
@@ -85,67 +83,11 @@ abstract class DCEntityEventHandlerBase extends ContainerAware
     {
         $repo = $this->em->getRepository($repositoryName);
 
-        if (method_exists($repo, 'bindDCEventListener')) {
-            $repo->bindDCEventListener($this->dcEventListener);
+        if (method_exists($repo, 'setDCEventListener')) {
+            $repo->setDCEventListener($this->dcEventListener);
         }
 
         return $repo;
-    }
-
-    /**
-     * Sets an entity flag
-     *
-     * @param $flagName
-     * @param $entity
-     *
-     * @return bool
-     * @author Andreas Glaser
-     */
-    public function flagSet($flagName, $entity)
-    {
-        return $this->dcEventListener->flagSet($flagName, $entity);
-    }
-
-    /**
-     * Checks if an entity flag has been set
-     *
-     * @param $flagName
-     * @param $entity
-     *
-     * @return bool
-     * @author Andreas Glaser
-     */
-    public function flagExists($flagName, $entity)
-    {
-        return $this->dcEventListener->flagExists($flagName, $entity);
-    }
-
-    /**
-     * Removes entity flag
-     *
-     * @param $flagName
-     * @param $entity
-     *
-     * @return bool
-     * @author Andreas Glaser
-     */
-    public function flagRemove($flagName, $entity)
-    {
-        return $this->dcEventListener->flagRemove($flagName, $entity);
-    }
-
-    /**
-     * Checks if an entity flag exists and removes it.
-     *
-     * @param $flagName
-     * @param $entity
-     *
-     * @return bool
-     * @author Andreas Glaser
-     */
-    public function flagExistsAndRemove($flagName, $entity)
-    {
-        return $this->dcEventListener->flagExistsAndRemove($flagName, $entity);
     }
 
     /**

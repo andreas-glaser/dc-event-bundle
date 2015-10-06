@@ -4,6 +4,7 @@ namespace AndreasGlaser\DCEventBundle\EventHandler;
 
 use AndreasGlaser\DCEventBundle\EventHandler;
 use AndreasGlaser\DCEventBundle\EventListener\DCEventListener;
+use AndreasGlaser\DCEventBundle\EventListener\DCEventListenerAwareTrait;
 use AndreasGlaser\DCEventBundle\Helper\ChangeSetHelper;
 use Doctrine\ORM;
 use Doctrine\ORM\EntityRepository;
@@ -18,10 +19,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 abstract class DCCommonEntityEventHandlerBase extends ContainerAware
 {
-    /**
-     * @var \AndreasGlaser\DCEventBundle\EventListener\DCEventListener
-     */
-    protected $dcEventListener;
+    use DCEventListenerAwareTrait;
 
     /**
      * @var ORM\EntityManager
@@ -36,6 +34,7 @@ abstract class DCCommonEntityEventHandlerBase extends ContainerAware
     public function __construct(ContainerInterface $container, DCEventListener $dcEventListener, ORM\EntityManagerInterface $entityManager)
     {
         $this->setContainer($container);
+        $this->setDCEventListener($dcEventListener);
         $this->dcEventListener = $dcEventListener;
         $this->entityManager = $entityManager;
     }
@@ -91,6 +90,7 @@ abstract class DCCommonEntityEventHandlerBase extends ContainerAware
         $this->prePersist($entity);
 
         $method = 'prePersist' . $this->getEntityName($entity);
+
         if (method_exists($this, $method)) {
             $this->$method($entity);
         }
@@ -207,8 +207,8 @@ abstract class DCCommonEntityEventHandlerBase extends ContainerAware
     {
         $repo = $this->entityManager->getRepository($repositoryName);
 
-        if (method_exists($repo, 'bindDCEventListener')) {
-            $repo->bindDCEventListener($this);
+        if (method_exists($repo, 'setDCEventListener')) {
+            $repo->setDCEventListener($this);
         }
 
         return $repo;

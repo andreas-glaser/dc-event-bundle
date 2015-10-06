@@ -5,6 +5,7 @@ namespace AndreasGlaser\DCEventBundle\EventListener;
 use AndreasGlaser\DCEventBundle\EventHandler\Annotations\DCEntityEventHandlerReader;
 use AndreasGlaser\DCEventBundle\EventHandler\DCEntityEventHandlerBase;
 use AndreasGlaser\DCEventBundle\Helper\ChangeSetHelper;
+use AndreasGlaser\DCEventBundle\Helper\FlagHelper;
 use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
@@ -23,11 +24,6 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
  */
 class DCEventListener implements EventSubscriber, ContainerAwareInterface
 {
-    /**
-     * @var array
-     */
-    protected $flags = [];
-
     /**
      * @var EntityManager
      */
@@ -53,6 +49,9 @@ class DCEventListener implements EventSubscriber, ContainerAwareInterface
      */
     protected $entityEventHandlerCache = [];
 
+    /**
+     * @var
+     */
     protected $commonEntityEventHandler;
 
     /**
@@ -64,7 +63,15 @@ class DCEventListener implements EventSubscriber, ContainerAwareInterface
         'remove'  => []
     ];
 
+    /**
+     * @var array
+     */
     protected $config = [];
+
+    /**
+     * @var \AndreasGlaser\DCEventBundle\Helper\FlagHelper
+     */
+    protected $flagHelper;
 
     /**
      * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
@@ -73,6 +80,7 @@ class DCEventListener implements EventSubscriber, ContainerAwareInterface
     {
         $this->setContainer($container);
         $this->config = $this->container->getParameter('andreas_glaser_dc_event');
+        $this->flagHelper = FlagHelper::factory();
     }
 
     /**
@@ -311,7 +319,7 @@ class DCEventListener implements EventSubscriber, ContainerAwareInterface
     {
         $count = 0;
         foreach ($this->recalculationQueue AS $hash => $entity) {
-            $this->initUpdate($entity, false);
+            $this->computeChangeSet($entity);
             unset($this->recalculationQueue[$hash]);
             $count++;
         }
@@ -387,94 +395,6 @@ class DCEventListener implements EventSubscriber, ContainerAwareInterface
     }
 
     /**
-     * Sets an entity flag
-     *
-     * @param $flagName
-     * @param $entity
-     *
-     * @return bool
-     * @author Andreas Glaser
-     */
-    public function flagSet($flagName, $entity)
-    {
-        if (!is_object($entity)) {
-            throw new \RuntimeException('Flag requires an entity to be set');
-        }
-
-        if ($this->flagExists($flagName, $entity)) {
-            return false;
-        }
-
-        $hash = spl_object_hash($entity);
-
-        if (!is_array($this->flags[$hash])) {
-            $this->flags[$hash] = [];
-        }
-
-        $this->flags[$hash][$flagName] = $flagName;
-
-        return true;
-    }
-
-    /**
-     * Checks if an entity flag has been set
-     *
-     * @param $flagName
-     * @param $entity
-     *
-     * @return bool
-     * @author Andreas Glaser
-     */
-    public function flagExists($flagName, $entity)
-    {
-        if (!is_object($entity)) {
-            throw new \RuntimeException('Flag requires an entity to be set');
-        }
-
-        $hash = spl_object_hash($entity);
-
-        return array_key_exists($hash, $this->flags) && array_key_exists($flagName, $this->flags[$hash]);
-    }
-
-    /**
-     * Removes an entity flag
-     *
-     * @param $flagName
-     * @param $entity
-     *
-     * @return bool
-     * @author Andreas Glaser
-     */
-    public function flagRemove($flagName, $entity)
-    {
-        if ($this->flagExists($flagName, $entity)) {
-            $hash = spl_object_hash($entity);
-            unset($this->flags[$hash][$flagName]);
-
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * Checks if an entity flag exists and removes it.
-     *
-     * @param $flagName
-     * @param $entity
-     *
-     * @return bool
-     * @author Andreas Glaser
-     */
-    public function flagExistsAndRemove($flagName, $entity)
-    {
-        $exists = $this->flagExists($flagName, $entity);
-        $this->flagRemove($flagName, $entity);
-
-        return $exists;
-    }
-
-    /**
      * Returns an entity repository with bound event listener.
      *
      * @param $repositoryName
@@ -486,10 +406,21 @@ class DCEventListener implements EventSubscriber, ContainerAwareInterface
     {
         $repo = $this->entityManager->getRepository($repositoryName);
 
-        if (method_exists($repo, 'bindDCEventListener')) {
-            $repo->bindDCEventListener($this);
+        if (method_exists($repo, 'setDCEventListener')) {
+            $repo->setDCEventListener($this);
         }
 
         return $repo;
+    }
+
+    /**
+     * Exposes flag helper.
+     *
+     * @return \AndreasGlaser\DCEventBundle\Helper\FlagHelper
+     * @author Andreas Glaser
+     */
+    public function getFlagHelper()
+    {
+        return $this->flagHelper;
     }
 }
