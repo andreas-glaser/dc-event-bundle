@@ -1,4 +1,3 @@
-DCEventBundle
-============
+# DCEventBundle - Doctrine Custom Event Bundle
 
-Doctrine Custom Event Bundle - Enabling you to persist, update, delete entities within prePersist/preUpdate/preRemove events
+This bundle attaches a custom doctrine event handler during preFlush, allowing you to persist, update and remove entities while having access to change sets.

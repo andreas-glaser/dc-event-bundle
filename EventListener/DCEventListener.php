@@ -7,6 +7,7 @@ use AndreasGlaser\DCEventBundle\EventHandler\DCEntityEventHandlerBase;
 use AndreasGlaser\DCEventBundle\Helper\ChangeSetHelper;
 use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\Event\PreFlushEventArgs;
 use Doctrine\ORM\UnitOfWork;
@@ -26,11 +27,6 @@ class DCEventListener implements EventSubscriber, ContainerAwareInterface
      * @var array
      */
     protected $flags = [];
-
-    /**
-     * @var \Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface
-     */
-    protected $tokenStorage;
 
     /**
      * @var EntityManager
@@ -57,6 +53,8 @@ class DCEventListener implements EventSubscriber, ContainerAwareInterface
      */
     protected $entityEventHandlerCache = [];
 
+    protected $commonEntityEventHandler;
+
     /**
      * @var array
      */
@@ -66,20 +64,19 @@ class DCEventListener implements EventSubscriber, ContainerAwareInterface
         'remove'  => []
     ];
 
-    /**
-     * @param \Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface $tokenStorage
-     * @param \Symfony\Component\DependencyInjection\ContainerInterface                           $container
-     */
-    public function __construct(TokenStorageInterface $tokenStorage, ContainerInterface $container)
-    {
-        $this->tokenStorage = $tokenStorage;
-        $this->setContainer($container);
-    }
+    protected $config = [];
 
     /**
      * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
-     *
-     * @author Andreas Glaser
+     */
+    public function __construct(ContainerInterface $container)
+    {
+        $this->setContainer($container);
+        $this->config = $this->container->getParameter('andreas_glaser_dc_event');
+    }
+
+    /**
+     * @inheritdoc
      */
     public function setContainer(ContainerInterface $container = null)
     {
@@ -103,6 +100,15 @@ class DCEventListener implements EventSubscriber, ContainerAwareInterface
     {
         $this->entityManager = $eventArgs->getEntityManager();
         $this->unitOfWork = $this->entityManager->getUnitOfWork();
+
+        if ($this->config['common_entity_event_handler']) {
+            if (class_exists($this->config['common_entity_event_handler'])) {
+                $this->commonEntityEventHandler = new $this->config['common_entity_event_handler']($this->container, $this, $this->entityManager);
+            } else {
+                throw new \InvalidArgumentException(strtr('":class" does not exist', [':class' => $this->config['common_entity_event_handler']]));
+            }
+        }
+
         $this->unitOfWork->computeChangeSets();
         $max = 50;
         $current = 0;
@@ -125,18 +131,33 @@ class DCEventListener implements EventSubscriber, ContainerAwareInterface
     public function postFlush(PostFlushEventArgs $postFlushEventArgs)
     {
         foreach ($this->processedEntities['persist'] AS $entity) {
+
+            if ($this->commonEntityEventHandler) {
+                $this->commonEntityEventHandler->initPostPersist($entity);
+            }
+
             if ($entityEventHandler = $this->getEntityEventHandler($entity)) {
                 $entityEventHandler->postPersist();
             }
         }
 
         foreach ($this->processedEntities['update'] AS $entity) {
+
+            if ($this->commonEntityEventHandler) {
+                $this->commonEntityEventHandler->initPostUpdate($entity);
+            }
+
             if ($entityEventHandler = $this->getEntityEventHandler($entity)) {
                 $entityEventHandler->postUpdate();
             }
         }
 
         foreach ($this->processedEntities['remove'] AS $entity) {
+
+            if ($this->commonEntityEventHandler) {
+                $this->commonEntityEventHandler->initPostRemove($entity);
+            }
+
             if ($entityEventHandler = $this->getEntityEventHandler($entity)) {
                 $entityEventHandler->postRemove();
             }
@@ -157,6 +178,7 @@ class DCEventListener implements EventSubscriber, ContainerAwareInterface
                 continue;
             }
             $this->initPersist($entity, true);
+            $this->processRecalculationQueue();
             $reRun = true;
         }
 
@@ -165,6 +187,7 @@ class DCEventListener implements EventSubscriber, ContainerAwareInterface
                 continue;
             }
             $this->initUpdate($entity, true);
+            $this->processRecalculationQueue();
             $reRun = true;
         }
 
@@ -173,10 +196,7 @@ class DCEventListener implements EventSubscriber, ContainerAwareInterface
                 continue;
             }
             $this->initRemove($entity, true);
-            $reRun = true;
-        }
-
-        if ($this->processRecalculationQueue()) {
+            $this->processRecalculationQueue();
             $reRun = true;
         }
 
@@ -184,13 +204,15 @@ class DCEventListener implements EventSubscriber, ContainerAwareInterface
     }
 
     /**
+     * Returns entity event handler for given entity if exists.
+     *
      * @param $entity
      *
-     * @return bool|DCEntityEventHandlerBase
+     * @return DCEntityEventHandlerBase|bool
      * @throws \Exception
      * @author Andreas Glaser
      */
-    public function getEntityEventHandler($entity)
+    protected function getEntityEventHandler($entity)
     {
         $entityHash = spl_object_hash($entity);
 
@@ -217,6 +239,11 @@ class DCEventListener implements EventSubscriber, ContainerAwareInterface
             $this->entityManager->persist($entity);
         }
 
+        if ($this->commonEntityEventHandler) {
+            $this->commonEntityEventHandler->initPrePersist($entity);
+            $this->computeChangeSet($entity);
+        }
+
         if ($entityEventHandler = $this->getEntityEventHandler($entity)) {
             $entityEventHandler->prePersist();
             $this->computeChangeSet($entity);
@@ -234,6 +261,11 @@ class DCEventListener implements EventSubscriber, ContainerAwareInterface
     protected function initUpdate(&$entity, $isInitial = false)
     {
         if (!$isInitial) {
+            $this->computeChangeSet($entity);
+        }
+
+        if ($this->commonEntityEventHandler) {
+            $this->commonEntityEventHandler->initPreUpdate($entity, ChangeSetHelper::factory($this->unitOfWork->getEntityChangeSet($entity)));
             $this->computeChangeSet($entity);
         }
 
@@ -255,6 +287,11 @@ class DCEventListener implements EventSubscriber, ContainerAwareInterface
     {
         if (!$isInitial) {
             $this->entityManager->remove($entity);
+        }
+
+        if ($this->commonEntityEventHandler) {
+            $this->commonEntityEventHandler->initPreRemove($entity);
+            $this->computeChangeSet($entity);
         }
 
         if ($entityEventHandler = $this->getEntityEventHandler($entity)) {
@@ -283,7 +320,23 @@ class DCEventListener implements EventSubscriber, ContainerAwareInterface
     }
 
     /**
-     * This function should be used to persist new entities within the persist, update, remove methods
+     * Computes or re-computes changes of given entity.
+     *
+     * @param $entity
+     *
+     * @author Andreas Glaser
+     */
+    protected function computeChangeSet(&$entity)
+    {
+        if ($this->unitOfWork->getEntityChangeSet($entity)) {
+            $this->unitOfWork->recomputeSingleEntityChangeSet($this->entityManager->getClassMetadata(get_class($entity)), $entity);
+        } else {
+            $this->unitOfWork->computeChangeSet($this->entityManager->getClassMetadata(get_class($entity)), $entity);
+        }
+    }
+
+    /**
+     * This function should be used to persist new entities within the persist, update and remove methods
      *
      * @param $entity
      *
@@ -299,7 +352,7 @@ class DCEventListener implements EventSubscriber, ContainerAwareInterface
     }
 
     /**
-     * This function needs to be applied to entities that are changed as part of the persist, update, remove methods
+     * This function needs to be applied to entities that are changed as part of the persist, update and remove methods
      *
      * @param $entity
      *
@@ -318,7 +371,7 @@ class DCEventListener implements EventSubscriber, ContainerAwareInterface
     }
 
     /**
-     * This function needs to be applied to entities that are removed as part of the persist, update, remove methods
+     * This function needs to be applied to entities that are removed as part of the persist, update and remove methods
      *
      * @param $entity
      *
@@ -331,20 +384,6 @@ class DCEventListener implements EventSubscriber, ContainerAwareInterface
         }
 
         $this->initRemove($entity, false);
-    }
-
-    /**
-     * @param $entity
-     *
-     * @author Andreas Glaser
-     */
-    public function computeChangeSet(&$entity)
-    {
-        if ($this->unitOfWork->getEntityChangeSet($entity)) {
-            $this->unitOfWork->recomputeSingleEntityChangeSet($this->entityManager->getClassMetadata(get_class($entity)), $entity);
-        } else {
-            $this->unitOfWork->computeChangeSet($this->entityManager->getClassMetadata(get_class($entity)), $entity);
-        }
     }
 
     /**
@@ -436,14 +475,14 @@ class DCEventListener implements EventSubscriber, ContainerAwareInterface
     }
 
     /**
-     * Returns entity repository with bound event listener.
+     * Returns an entity repository with bound event listener.
      *
      * @param $repositoryName
      *
-     * @return mixed
+     * @return EntityRepository
      * @author Andreas Glaser
      */
-    protected function getRepository($repositoryName)
+    public function getRepository($repositoryName)
     {
         $repo = $this->entityManager->getRepository($repositoryName);
 

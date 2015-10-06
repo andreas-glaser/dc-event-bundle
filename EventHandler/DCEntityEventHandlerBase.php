@@ -1,4 +1,5 @@
 <?php
+
 namespace AndreasGlaser\DCEventBundle\EventHandler;
 
 use AndreasGlaser\DCEventBundle\EventHandler;

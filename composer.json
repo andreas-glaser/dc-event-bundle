@@ -1,7 +1,12 @@
 {
   "name": "andreas-glaser/dc-event-bundle",
   "type": "symfony-bundle",
-  "description": "Doctrine Custom Event Bundle - Enabling you to persist, update, delete entities within prePersist/preUpdate/preRemove events",
+  "keywords": [
+    "doctrine",
+    "event",
+    "database"
+  ],
+  "description": "This bundle attaches a custom doctrine event handler during preFlush, allowing you to persist, update and remove entities while having access to change sets.",
   "homepage": "https://github.com/andreas-glaser/dc-event-bundle",
   "license": "MIT",
   "authors": [
@@ -18,7 +23,7 @@
   },
   "extra": {
     "branch-alias": {
-      "dev-master": "0.1.x-dev"
+      "dev-master": "0.2.x-dev"
     }
   }
 }

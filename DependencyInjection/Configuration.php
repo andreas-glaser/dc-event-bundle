@@ -18,11 +18,14 @@ class Configuration implements ConfigurationInterface
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('andreas_glaser_dc_event');
+        $rootNode = $treeBuilder->root('andreas_glaser_dc_event', 'array');
 
-        // Here you should define the parameters that are allowed to
-        // configure your bundle. See the documentation linked above for
-        // more information on that topic.
+        $rootNode
+            ->addDefaultsIfNotSet()
+            ->children()
+            ->booleanNode('enabled')->defaultValue(true)->end()
+            ->scalarNode('common_entity_event_handler')->defaultValue(null)->end()
+            ->end();
 
         return $treeBuilder;
     }

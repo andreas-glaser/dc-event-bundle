@@ -5,7 +5,6 @@ services:
     andreas_glaser_dc_event.event_listener.doctrine_custom:
         class: %andreas_glaser_dc_event.event_listener.doctrine.class%
         arguments:
-          - @security.token_storage
           - @service_container
         tags:
             - { name: doctrine.event_subscriber }
