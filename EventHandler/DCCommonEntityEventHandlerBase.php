@@ -208,7 +208,7 @@ abstract class DCCommonEntityEventHandlerBase extends ContainerAware
         $repo = $this->entityManager->getRepository($repositoryName);
 
         if (method_exists($repo, 'setDCEventListener')) {
-            $repo->setDCEventListener($this);
+            $repo->setDCEventListener($this->dcEventListener);
         }
 
         return $repo;
