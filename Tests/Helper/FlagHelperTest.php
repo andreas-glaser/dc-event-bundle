@@ -5,12 +5,12 @@ namespace AndreasGlaser\DCEventBundle\Tests\Helper;
 use AndreasGlaser\DCEventBundle\Helper\FlagHelper;
 
 /**
- * Class FlagHelperTestTest
+ * Class FlagHelperTest
  *
  * @package AndreasGlaser\DCEventBundle\Tests\Helper
  * @author  Andreas Glaser
  */
-class FlagHelperTestTest extends \PHPUnit_Framework_TestCase
+class FlagHelperTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @author Andreas Glaser
