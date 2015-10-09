@@ -44,8 +44,7 @@ class FlagHelper
         }
 
         $hash = spl_object_hash($entity);
-
-        if (!is_array($this->flags[$hash])) {
+        if (!array_key_exists($hash, $this->flags)) {
             $this->flags[$hash] = [];
         }
 
