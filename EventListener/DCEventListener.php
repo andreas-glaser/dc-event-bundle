@@ -3,6 +3,7 @@
 namespace AndreasGlaser\DCEventBundle\EventListener;
 
 use AndreasGlaser\DCEventBundle\EventHandler\Annotations\DCEntityEventHandlerReader;
+use AndreasGlaser\DCEventBundle\EventHandler\DCCommonEntityEventHandlerBase;
 use AndreasGlaser\DCEventBundle\EventHandler\DCEntityEventHandlerBase;
 use AndreasGlaser\DCEventBundle\Helper\ChangeSetHelper;
 use AndreasGlaser\DCEventBundle\Helper\FlagHelper;
@@ -14,7 +15,6 @@ use Doctrine\ORM\Event\PreFlushEventArgs;
 use Doctrine\ORM\UnitOfWork;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 /**
  * Class DCEventListener
@@ -50,7 +50,7 @@ class DCEventListener implements EventSubscriber, ContainerAwareInterface
     protected $entityEventHandlerCache = [];
 
     /**
-     * @var
+     * @var DCCommonEntityEventHandlerBase
      */
     protected $commonEntityEventHandler;
 
@@ -190,7 +190,7 @@ class DCEventListener implements EventSubscriber, ContainerAwareInterface
             $reRun = true;
         }
 
-        foreach ($this->unitOfWork->getScheduledEntityUpdates() + $this->unitOfWork->getScheduledCollectionUpdates() AS $hash => $entity) {
+        foreach ($this->unitOfWork->getScheduledEntityUpdates() AS $hash => $entity) {
             if (array_key_exists($hash, $this->processedEntities['update'])) {
                 continue;
             }
@@ -199,7 +199,7 @@ class DCEventListener implements EventSubscriber, ContainerAwareInterface
             $reRun = true;
         }
 
-        foreach ($this->unitOfWork->getScheduledEntityDeletions() + $this->unitOfWork->getScheduledCollectionDeletions() AS $hash => $entity) {
+        foreach ($this->unitOfWork->getScheduledEntityDeletions() AS $hash => $entity) {
             if (array_key_exists($hash, $this->processedEntities['remove'])) {
                 continue;
             }
@@ -241,7 +241,7 @@ class DCEventListener implements EventSubscriber, ContainerAwareInterface
      *
      * @author Andreas Glaser
      */
-    protected function initPersist(&$entity, $isInitial = false)
+    protected function initPersist($entity, $isInitial = false)
     {
         if (!$isInitial) {
             $this->entityManager->persist($entity);
@@ -266,7 +266,7 @@ class DCEventListener implements EventSubscriber, ContainerAwareInterface
      *
      * @author Andreas Glaser
      */
-    protected function initUpdate(&$entity, $isInitial = false)
+    protected function initUpdate($entity, $isInitial = false)
     {
         if (!$isInitial) {
             $this->computeChangeSet($entity);
@@ -291,7 +291,7 @@ class DCEventListener implements EventSubscriber, ContainerAwareInterface
      *
      * @author Andreas Glaser
      */
-    protected function initRemove(&$entity, $isInitial = false)
+    protected function initRemove($entity, $isInitial = false)
     {
         if (!$isInitial) {
             $this->entityManager->remove($entity);
@@ -334,7 +334,7 @@ class DCEventListener implements EventSubscriber, ContainerAwareInterface
      *
      * @author Andreas Glaser
      */
-    protected function computeChangeSet(&$entity)
+    protected function computeChangeSet($entity)
     {
         if ($this->unitOfWork->getEntityChangeSet($entity)) {
             $this->unitOfWork->recomputeSingleEntityChangeSet($this->entityManager->getClassMetadata(get_class($entity)), $entity);
@@ -350,7 +350,7 @@ class DCEventListener implements EventSubscriber, ContainerAwareInterface
      *
      * @author Andreas Glaser
      */
-    public function persist(&$entity)
+    public function persist($entity)
     {
         if (!$entity) {
             return;
@@ -366,7 +366,7 @@ class DCEventListener implements EventSubscriber, ContainerAwareInterface
      *
      * @author Andreas Glaser
      */
-    public function recalculate(&$entity)
+    public function recalculate($entity)
     {
         if (!$entity) {
             return;
@@ -385,7 +385,7 @@ class DCEventListener implements EventSubscriber, ContainerAwareInterface
      *
      * @author Andreas Glaser
      */
-    public function remove(&$entity)
+    public function remove($entity)
     {
         if (!$entity) {
             return;
