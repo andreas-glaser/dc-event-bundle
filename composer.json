@@ -16,17 +16,19 @@
     }
   ],
   "require": {
-    "php": ">=5.4.0"
+    "php": ">=5.4"
   },
   "require-dev": {
     "symfony/phpunit-bridge": "^2.7"
   },
   "autoload": {
-    "psr-4": {"AndreasGlaser\\DCEventBundle\\": ""}
+    "psr-4": {
+      "AndreasGlaser\\DCEventBundle\\": ""
+    }
   },
   "extra": {
     "branch-alias": {
-      "dev-master": "0.2.x-dev"
+      "dev-master": "1.0.x-dev"
     }
   }
 }
