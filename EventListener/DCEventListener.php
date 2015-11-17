@@ -191,7 +191,7 @@ class DCEventListener implements EventSubscriber, ContainerAwareInterface
         }
 
         foreach ($this->unitOfWork->getScheduledEntityUpdates() AS $hash => $entity) {
-            if (array_key_exists($hash, $this->processedEntities['update'])) {
+            if (array_key_exists($hash, $this->processedEntities['update']) || array_key_exists($hash, $this->processedEntities['remove'])) {
                 continue;
             }
             $this->initUpdate($entity, true);
