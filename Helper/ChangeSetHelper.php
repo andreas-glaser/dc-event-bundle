@@ -5,7 +5,7 @@ namespace AndreasGlaser\DCEventBundle\Helper;
 /**
  * Class ChangeSetHelper
  *
- * @package AndreasGlaser\SF2BaseBundle\Helper
+ * @package AndreasGlaser\DCEventBundle\Helper
  * @author  Andreas Glaser
  */
 class ChangeSetHelper
@@ -15,11 +15,22 @@ class ChangeSetHelper
      */
     protected $entityChangeSet = [];
 
+    /**
+     * @param array $entityChangeSet
+     *
+     * @return \AndreasGlaser\DCEventBundle\Helper\ChangeSetHelper
+     * @author Andreas Glaser
+     */
     public static function factory(array $entityChangeSet)
     {
         return new ChangeSetHelper($entityChangeSet);
     }
 
+    /**
+     * ChangeSetHelper constructor.
+     *
+     * @param array $entityChangeSet
+     */
     public function __construct(array $entityChangeSet)
     {
         $this->entityChangeSet = $entityChangeSet;
