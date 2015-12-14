@@ -2,6 +2,7 @@
 
 namespace AndreasGlaser\DCEventBundle\EventHandler\Annotations;
 
+use AndreasGlaser\Helpers\StringHelper;
 use Doctrine\Common\Annotations\AnnotationReader;
 
 /**
@@ -21,6 +22,13 @@ class DCEntityEventHandlerReader
      */
     public static function get($entityClass)
     {
+        $className = get_class($entityClass);
+
+        // translate proxy classes
+        if (StringHelper::startsWith($className, 'Proxies\\__CG__\\')) {
+            $entityClass = substr($className, strlen('Proxies\\__CG__\\'));
+        }
+
         $reader = new AnnotationReader();
         $apiMetaAnnotation = $reader
             ->getClassAnnotation(
