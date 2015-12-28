@@ -6,7 +6,7 @@
     "event",
     "database"
   ],
-  "description": "This bundle attaches a custom doctrine event handler during preFlush, allowing you to persist, update and remove entities while having access to change sets.",
+  "description": "Doctrine Custom Event Bundle - This bundle attaches an event handler during preFlush, allowing you to persist, update and remove entities while having access to change sets.",
   "homepage": "https://github.com/andreas-glaser/dc-event-bundle",
   "license": "MIT",
   "authors": [
@@ -16,7 +16,7 @@
     }
   ],
   "require": {
-    "php": ">=5.4",
+    "php": ">=5.5.9",
     "andreas-glaser/php-helpers": "dev-master"
   },
   "require-dev": {

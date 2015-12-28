@@ -60,7 +60,7 @@ class DCEventListener implements EventSubscriber, ContainerAwareInterface
     protected $processedEntities = [
         'persist' => [],
         'update'  => [],
-        'remove'  => []
+        'remove'  => [],
     ];
 
     /**

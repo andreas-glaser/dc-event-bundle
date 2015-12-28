@@ -6,6 +6,7 @@ use AndreasGlaser\DCEventBundle\EventHandler;
 use AndreasGlaser\DCEventBundle\EventListener\DCEventListener;
 use AndreasGlaser\DCEventBundle\EventListener\DCEventListenerAwareTrait;
 use AndreasGlaser\DCEventBundle\Helper\ChangeSetHelper;
+use AndreasGlaser\Helpers\StringHelper;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerAware;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -13,7 +14,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * Class DCEntityEventHandlerBase
  *
- * @author Andreas Glaser
+ * @package AndreasGlaser\DCEventBundle\EventHandler
+ * @author  Andreas Glaser
  */
 abstract class DCEntityEventHandlerBase extends ContainerAware
 {
@@ -37,13 +39,39 @@ abstract class DCEntityEventHandlerBase extends ContainerAware
      */
     public function __construct(DCEventListener $dcEventListener, EntityManagerInterface $entityManager, $entity, ContainerInterface $container)
     {
+        $this->entity = $entity;
+
+        if (!$this->supports()) {
+            throw new DCEntityEventHandlerException('Entity event handler does not support this entity');
+        }
+
         $this->setDCEventListener($dcEventListener);
         $this->em = $entityManager;
-        $this->entity = $entity;
         $this->setContainer($container);
     }
 
     /**
+     * @return bool
+     * @author Andreas Glaser
+     */
+    public function supports()
+    {
+        $eehClassFullyQualified = get_called_class();
+
+        if (!StringHelper::endsWith($eehClassFullyQualified, 'EEH')) {
+            return false;
+        }
+
+        $eehClass = substr($eehClassFullyQualified, strrpos($eehClassFullyQualified, '\\') + 1, -3);
+        $entityClassFullyQualified = get_class($this->entity);
+        $entityClass = substr($entityClassFullyQualified, strrpos($entityClassFullyQualified, '\\') + 1);
+
+        return $eehClass === $entityClass;
+    }
+
+    /**
+     * Alias
+     *
      * @param $entity
      *
      * @author Andreas Glaser
@@ -54,6 +82,8 @@ abstract class DCEntityEventHandlerBase extends ContainerAware
     }
 
     /**
+     * Alias
+     *
      * @param $entity
      *
      * @author Andreas Glaser
@@ -64,6 +94,8 @@ abstract class DCEntityEventHandlerBase extends ContainerAware
     }
 
     /**
+     * Alias
+     *
      * @param $entity
      *
      * @author Andreas Glaser

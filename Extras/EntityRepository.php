@@ -8,7 +8,7 @@ use Doctrine\ORM\EntityRepository as BaseEntityRepository;
 use Doctrine\ORM\Query;
 
 /**
- * Class EntityRepository
+ * DCEventListener aware entity repository.
  *
  * @package AndreasGlaser\DCEventBundle\Extras
  * @inheritdoc
