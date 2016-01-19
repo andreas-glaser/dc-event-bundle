@@ -8,7 +8,7 @@ use AndreasGlaser\DCEventBundle\EventListener\DCEventListenerAwareTrait;
 use AndreasGlaser\DCEventBundle\Helper\ChangeSetHelper;
 use AndreasGlaser\Helpers\StringHelper;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\DependencyInjection\ContainerAware;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -17,9 +17,10 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * @package AndreasGlaser\DCEventBundle\EventHandler
  * @author  Andreas Glaser
  */
-abstract class DCEntityEventHandlerBase extends ContainerAware
+abstract class DCEntityEventHandlerBase
 {
     use DCEventListenerAwareTrait;
+    use ContainerAwareTrait;
 
     /**
      * @var EntityManagerInterface

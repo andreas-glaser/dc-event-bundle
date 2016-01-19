@@ -2,6 +2,7 @@
   "name": "andreas-glaser/dc-event-bundle",
   "type": "symfony-bundle",
   "keywords": [
+    "symfony",
     "doctrine",
     "event",
     "database"
@@ -17,7 +18,8 @@
   ],
   "require": {
     "php": ">=5.5.9",
-    "andreas-glaser/php-helpers": "dev-master"
+    "andreas-glaser/php-helpers": "^1",
+    "symfony/framework-bundle": "^2.8"
   },
   "require-dev": {
     "symfony/phpunit-bridge": "^2.7"

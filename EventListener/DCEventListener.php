@@ -14,6 +14,7 @@ use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\Event\PreFlushEventArgs;
 use Doctrine\ORM\UnitOfWork;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -22,8 +23,10 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * @package AndreasGlaser\DCEventBundle\EventListener
  * @author  Andreas Glaser
  */
-class DCEventListener implements EventSubscriber, ContainerAwareInterface
+class DCEventListener implements EventSubscriber
 {
+    use ContainerAwareTrait;
+
     /**
      * @var EntityManager
      */
