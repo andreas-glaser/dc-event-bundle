@@ -38,11 +38,6 @@ class DCEventListener implements EventSubscriber
     protected $unitOfWork;
 
     /**
-     * @var ContainerInterface
-     */
-    protected $container;
-
-    /**
      * @var array
      */
     protected $recalculationQueue = [];
