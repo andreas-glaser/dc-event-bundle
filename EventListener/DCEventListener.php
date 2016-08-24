@@ -60,7 +60,7 @@ class DCEventListener implements EventSubscriber, ContainerAwareInterface
     protected $processedEntities = [
         'persist' => [],
         'update'  => [],
-        'remove'  => []
+        'remove'  => [],
     ];
 
     /**
@@ -80,6 +80,24 @@ class DCEventListener implements EventSubscriber, ContainerAwareInterface
     {
         $this->setContainer($container);
         $this->config = $this->container->getParameter('andreas_glaser_dc_event');
+        $this->flagHelper = FlagHelper::factory();
+    }
+
+    /**
+     * Resets temporary values
+     *
+     * @author Andreas Glaser
+     */
+    protected function reset()
+    {
+        $this->recalculationQueue = [];
+        $this->entityEventHandlerCache = [];
+        $this->commonEntityEventHandler = null;
+        $this->processedEntities = [
+            'persist' => [],
+            'update'  => [],
+            'remove'  => [],
+        ];
         $this->flagHelper = FlagHelper::factory();
     }
 
@@ -106,6 +124,8 @@ class DCEventListener implements EventSubscriber, ContainerAwareInterface
      */
     public function preFlush(PreFlushEventArgs $eventArgs)
     {
+        $this->reset();
+
         $this->entityManager = $eventArgs->getEntityManager();
         $this->unitOfWork = $this->entityManager->getUnitOfWork();
 
