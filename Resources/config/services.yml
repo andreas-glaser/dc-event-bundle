@@ -3,8 +3,8 @@ parameters:
 
 services:
     andreas_glaser_dc_event.event_listener.doctrine_custom:
-        class: %andreas_glaser_dc_event.event_listener.doctrine.class%
+        class: '%andreas_glaser_dc_event.event_listener.doctrine.class%'
         arguments:
-          - @service_container
+          - '@service_container'
         tags:
             - { name: doctrine.event_subscriber }
