@@ -128,6 +128,11 @@ use AppBundle\Entity as AppBundleEntity;
 class ArticleEEH extends DCEntityEventHandlerBase
 {
     /**
+     * @var AppBundleEntity\Article
+     */
+    protected $entity;
+    
+    /**
      * @return void
      */
     public function prePersist()
@@ -137,7 +142,6 @@ class ArticleEEH extends DCEntityEventHandlerBase
 
     /**
      * @return void
-     * @author Andreas Glaser
      */
     public function postPersist()
     {
