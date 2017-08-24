@@ -2,14 +2,14 @@
 
 This bundle attaches an event handler during preFlush, allowing you to persist, update and remove entities while having access to change sets.
 
-##Installation
+## Installation
 ```bash
 composer require andreas-glaser/dc-event-bundle ^1
 ```
 
-##Usage
+## Usage
 
-###1.) Attach entity event listener
+### 1.) Attach entity event listener
 ```php
 <?php
 
@@ -110,7 +110,7 @@ class Article
 }
 ```
 
-###2.) Create entity event handler
+### 2.) Create entity event handler
 ```php
 <?php
 
