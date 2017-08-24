@@ -82,6 +82,24 @@ class DCEventListener implements EventSubscriber
     }
 
     /**
+     * Resets temporary values
+     *
+     * @author Andreas Glaser
+     */
+    protected function reset()
+    {
+        $this->recalculationQueue = [];
+        $this->entityEventHandlerCache = [];
+        $this->commonEntityEventHandler = null;
+        $this->processedEntities = [
+            'persist' => [],
+            'update'  => [],
+            'remove'  => [],
+        ];
+        $this->flagHelper = FlagHelper::factory();
+    }
+
+    /**
      * @inheritdoc
      */
     public function setContainer(ContainerInterface $container = null)
@@ -104,6 +122,8 @@ class DCEventListener implements EventSubscriber
      */
     public function preFlush(PreFlushEventArgs $eventArgs)
     {
+        $this->reset();
+
         $this->entityManager = $eventArgs->getEntityManager();
         $this->unitOfWork = $this->entityManager->getUnitOfWork();
 
