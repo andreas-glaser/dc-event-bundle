@@ -13,21 +13,28 @@
   "authors": [
     {
       "name": "Andreas Glaser",
-      "email": "andreas.c.glaser@gmail.com"
+      "email": "andreas.glaser@protonmail.com"
     }
   ],
   "require": {
-    "php": ">=5.5.9",
+    "php": "^7",
+    "doctrine/orm": "^2.5",
     "andreas-glaser/php-helpers": "^1",
     "symfony/framework-bundle": "^2.8"
   },
   "require-dev": {
-    "symfony/phpunit-bridge": "^2.7"
+    "symfony/phpunit-bridge": "^3.2",
+    "phpunit/phpunit": "@stable",
+    "symfony/var-dumper": "@stable",
+    "doctrine/data-fixtures": "@stable"
   },
   "autoload": {
     "psr-4": {
       "AndreasGlaser\\DCEventBundle\\": ""
-    }
+    },
+    "exclude-from-classmap": [
+      "Tests/"
+    ]
   },
   "extra": {
     "branch-alias": {

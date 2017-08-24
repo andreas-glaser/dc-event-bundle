@@ -136,17 +136,10 @@ class DCEventListener implements EventSubscriber
         }
 
         $this->unitOfWork->computeChangeSets();
-        $max = 50;
-        $current = 0;
 
         do {
             $runAgain = $this->executeEvents();
-            $current++;
-        } while ($runAgain === true && $current <= $max);
-
-        if ($current >= $max) {
-            throw new \RuntimeException('Too many iterations... something must have gone wrong.');
-        }
+        } while ($runAgain === true);
     }
 
     /**
@@ -191,7 +184,6 @@ class DCEventListener implements EventSubscriber
     }
 
     /**
-     * @internal
      * @return bool
      * @author Andreas Glaser
      */
@@ -329,7 +321,6 @@ class DCEventListener implements EventSubscriber
     }
 
     /**
-     * @internal
      * @return int
      * @author Andreas Glaser
      */
