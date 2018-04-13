@@ -13,7 +13,6 @@ use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\Event\PreFlushEventArgs;
 use Doctrine\ORM\UnitOfWork;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -317,12 +316,10 @@ class DCEventListener implements EventSubscriber
 
         if ($this->commonEntityEventHandler) {
             $this->commonEntityEventHandler->initPreRemove($entity);
-            $this->computeChangeSet($entity);
         }
 
         if ($entityEventHandler = $this->getEntityEventHandler($entity)) {
             $entityEventHandler->preRemove();
-            $this->computeChangeSet($entity);
         }
 
         $this->processedEntities['remove'][spl_object_hash($entity)] = $entity;
@@ -354,10 +351,6 @@ class DCEventListener implements EventSubscriber
      */
     protected function computeChangeSet($entity)
     {
-        if (false === $this->unitOfWork->isInIdentityMap($entity)) {
-            return;
-        }
-
         if ($this->unitOfWork->getEntityChangeSet($entity)) {
             $this->unitOfWork->recomputeSingleEntityChangeSet($this->entityManager->getClassMetadata(get_class($entity)), $entity);
         } else {
