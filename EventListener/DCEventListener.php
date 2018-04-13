@@ -13,7 +13,6 @@ use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\Event\PreFlushEventArgs;
 use Doctrine\ORM\UnitOfWork;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -345,6 +344,10 @@ class DCEventListener implements EventSubscriber
      */
     protected function computeChangeSet($entity)
     {
+        if (false === $this->unitOfWork->isInIdentityMap($entity)) {
+            return;
+        }
+
         if ($this->unitOfWork->getEntityChangeSet($entity)) {
             $this->unitOfWork->recomputeSingleEntityChangeSet($this->entityManager->getClassMetadata(get_class($entity)), $entity);
         } else {
