@@ -316,10 +316,12 @@ class DCEventListener implements EventSubscriber
 
         if ($this->commonEntityEventHandler) {
             $this->commonEntityEventHandler->initPreRemove($entity);
+            $this->computeChangeSet($entity);
         }
 
         if ($entityEventHandler = $this->getEntityEventHandler($entity)) {
             $entityEventHandler->preRemove();
+            $this->computeChangeSet($entity);
         }
 
         $this->processedEntities['remove'][spl_object_hash($entity)] = $entity;
