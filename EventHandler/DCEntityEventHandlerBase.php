@@ -125,13 +125,11 @@ abstract class DCEntityEventHandlerBase
 
     /**
      * @return void
-     * @author Andreas Glaser
      */
     abstract public function prePersist();
 
     /**
      * @return void
-     * @author Andreas Glaser
      */
     abstract public function postPersist();
 
@@ -139,25 +137,23 @@ abstract class DCEntityEventHandlerBase
      * @param \AndreasGlaser\DCEventBundle\Helper\ChangeSetHelper $changeSet
      *
      * @return void
-     * @author Andreas Glaser
      */
     abstract public function preUpdate(ChangeSetHelper $changeSet);
 
     /**
      * @return void
-     * @author Andreas Glaser
      */
     abstract public function postUpdate();
 
     /**
+     * Important: The entity being deleted cannot be further updated within this event method.
+     *
      * @return void
-     * @author Andreas Glaser
      */
     abstract public function preRemove();
 
     /**
      * @return void
-     * @author Andreas Glaser
      */
     abstract public function postRemove();
 }
