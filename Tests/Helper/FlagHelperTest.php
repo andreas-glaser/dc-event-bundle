@@ -3,6 +3,7 @@
 namespace AndreasGlaser\DCEventBundle\Tests\Helper;
 
 use AndreasGlaser\DCEventBundle\Helper\FlagHelper;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Class FlagHelperTest
@@ -10,7 +11,7 @@ use AndreasGlaser\DCEventBundle\Helper\FlagHelper;
  * @package AndreasGlaser\DCEventBundle\Tests\Helper
  * @author  Andreas Glaser
  */
-class FlagHelperTest extends \PHPUnit_Framework_TestCase
+class FlagHelperTest extends TestCase
 {
     /**
      * @author Andreas Glaser
@@ -35,7 +36,7 @@ class FlagHelperTest extends \PHPUnit_Framework_TestCase
      */
     public function testInvalidInput()
     {
-        $this->setExpectedException('RuntimeException');
+        $this->expectException('RuntimeException');
 
         $flagHelper = FlagHelper::factory();
         $testObject = 'invalid';

@@ -6,6 +6,7 @@ use AndreasGlaser\DCEventBundle\Tests\TestData;
 use Doctrine\Common\DataFixtures;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\ORM;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Class DCEventListenerTest
@@ -13,7 +14,7 @@ use Doctrine\ORM;
  * @package AndreasGlaser\DCEventBundle\Tests\EventListener
  * @author  Andreas Glaser
  */
-class DCEventListenerTest extends \PHPUnit_Framework_TestCase
+class DCEventListenerTest extends TestCase
 {
     /**
      * @var ORM\EntityManager
@@ -28,6 +29,7 @@ class DCEventListenerTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
+
         $conn = DriverManager::getConnection([
             'driver' => 'pdo_sqlite',
             'dbname' => ':memory:',
