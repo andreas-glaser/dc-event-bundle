@@ -2,13 +2,13 @@
 
 namespace AndreasGlaser\DCEventBundle\EventHandler;
 
-use AndreasGlaser\DCEventBundle\EventHandler;
 use AndreasGlaser\DCEventBundle\EventListener\DCEventListener;
 use AndreasGlaser\DCEventBundle\EventListener\DCEventListenerAwareTrait;
 use AndreasGlaser\DCEventBundle\Helper\ChangeSetHelper;
 use Doctrine\ORM;
 use Doctrine\ORM\EntityRepository;
-use Symfony\Component\DependencyInjection\ContainerAware;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -17,8 +17,9 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * @package AndreasGlaser\DCEventBundle\EventHandler
  * @author  Andreas Glaser
  */
-abstract class DCCommonEntityEventHandlerBase extends ContainerAware
+abstract class DCCommonEntityEventHandlerBase implements ContainerAwareInterface
 {
+    use ContainerAwareTrait;
     use DCEventListenerAwareTrait;
 
     /**
