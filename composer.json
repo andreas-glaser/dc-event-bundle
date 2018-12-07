@@ -13,13 +13,13 @@
   "authors": [
     {
       "name": "Andreas Glaser",
-      "email": "andreas.c.glaser@gmail.com"
+      "email": "andreas.glaser@pm.me"
     }
   ],
   "require": {
-    "php": ">=5.5.9",
+    "php": "^7.2",
     "andreas-glaser/php-helpers": "^1",
-    "symfony/framework-bundle": "^2.8"
+    "symfony/framework-bundle": "^3.4"
   },
   "require-dev": {
     "symfony/phpunit-bridge": "^2.7"
@@ -31,7 +31,7 @@
   },
   "extra": {
     "branch-alias": {
-      "dev-master": "1.1-dev"
+      "dev-master": "1.2-dev"
     }
   }
 }
